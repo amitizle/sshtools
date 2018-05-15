@@ -31,16 +31,16 @@
   version = "v1.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/logrusorgru/aurora"
+  packages = ["."]
+  revision = "d694e6f975a9109e2b063829d563a7c153c4b53c"
+
+[[projects]]
   name = "github.com/magiconair/properties"
   packages = ["."]
   revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
   version = "v1.7.6"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/mitchellh/go-homedir"
-  packages = ["."]
-  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
 
 [[projects]]
   branch = "master"
@@ -97,7 +97,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
-  revision = "d0faeb539838e250bd0a9db4182d48d4a1915181"
+  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -121,6 +121,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "502ed800d6adfbf688650bd51cfa1f38d661360bdfd6a1d499b38bc4a37999fc"
+  inputs-digest = "3194d09f6cfa0d4f69080340bd5794ec2528a85696a99f04e8d70ffd0440b00f"
   solver-name = "gps-cdcl"
   solver-version = 1

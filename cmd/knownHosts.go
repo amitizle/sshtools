@@ -1,44 +1,82 @@
-// Copyright © 2018 NAME HERE <EMAIL ADDRESS>
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package cmd
 
 import (
+	// "bufio"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"strings"
 
+	"github.com/amitizle/sshtools/internal/printer"
 	"github.com/spf13/cobra"
 )
 
 // knownHostsCmd represents the knownHosts command
-var knownHostsCmd = &cobra.Command{
-	Use:   "known-hosts",
-	Short: "Manipulate known_hosts file",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("knownHosts called")
-	},
+var (
+	knownHostsCmd = &cobra.Command{
+		Use:   "known-hosts",
+		Short: "Manipulate known_hosts file",
+	}
+
+	knownHostsRmCmd = &cobra.Command{
+		Use:   "rm",
+		Short: "Remove a line or lines from the known_hosts file",
+		Run:   rmKnownHosts,
+	}
+
+	knownHostsSortCmd = &cobra.Command{
+		Use:   "sort",
+		Short: "Sort the known_hosts file alphanumerically",
+		Run:   sortKnownHosts,
+	}
+
+	fileLine    int
+	sortReverse bool
+)
+
+// TODO:
+// 1) Add a file path together with the default ssh-dir
+func init() {
+	// add known-hosts command
+	sshtoolsCmd.AddCommand(knownHostsCmd)
+	// add rm command
+	knownHostsRmCmd.Flags().IntVarP(&fileLine, "line", "l", -1, "Line number of the record to delete (starting at 1)") // TODO lines, not line
+	knownHostsRmCmd.MarkFlagRequired("line")
+	knownHostsCmd.AddCommand(knownHostsRmCmd)
+
+	// add sort command
+	knownHostsCmd.AddCommand(knownHostsSortCmd)
+	knownHostsSortCmd.Flags().BoolVarP(&sortReverse, "reverse", "r", false, "Sort the file in reverse order")
 }
 
-func init() {
-	rootCmd.AddCommand(knownHostsCmd)
+// TODO extract the read/write file logic
+func rmKnownHosts(cmd *cobra.Command, args []string) {
+	knownHostsFilePath := path.Join(sshDir, "known_hosts") // TODO not a good place for default value
+	knownHostsContent, err := ioutil.ReadFile(knownHostsFilePath)
+	if err != nil {
+		printer.Error(fmt.Sprintf("Cannot read %s, %v", knownHostsFilePath, err))
+		os.Exit(1)
+	}
 
-	// Here you will define your flags and configuration settings.
+	knownHostsLines := strings.Split(string(knownHostsContent), "\n")
+	resultFileContent := make([]string, 0)
+	for currLineIndex, currLine := range knownHostsLines {
+		if currLineIndex+1 == fileLine {
+			printer.Warn(fmt.Sprintf("Removing line:\n%s\n", currLine))
+		} else {
+			resultFileContent = append(resultFileContent, currLine)
+		}
+	}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// knownHostsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	knownHostsNewContent := strings.Join(resultFileContent, "\n")
+	err = ioutil.WriteFile(knownHostsFilePath, []byte(knownHostsNewContent), 0644)
+	if err != nil {
+		printer.Error(fmt.Sprintf("Cannot write to %s, %v", knownHostsFilePath, err))
+	}
+}
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// knownHostsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+// TODO implement
+func sortKnownHosts(cmd *cobra.Command, args []string) {
+	fmt.Println("Sort called")
 }
