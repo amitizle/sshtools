@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	// "bufio"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -55,7 +53,7 @@ func rmKnownHosts(cmd *cobra.Command, args []string) {
 	knownHostsFilePath := path.Join(sshDir, "known_hosts") // TODO not a good place for default value
 	knownHostsContent, err := ioutil.ReadFile(knownHostsFilePath)
 	if err != nil {
-		printer.Error(fmt.Sprintf("Cannot read %s, %v", knownHostsFilePath, err))
+		printer.Errorf("Cannot read %s, %v", knownHostsFilePath, err)
 		os.Exit(1)
 	}
 
@@ -63,7 +61,7 @@ func rmKnownHosts(cmd *cobra.Command, args []string) {
 	resultFileContent := make([]string, 0)
 	for currLineIndex, currLine := range knownHostsLines {
 		if currLineIndex+1 == fileLine {
-			printer.Warn(fmt.Sprintf("Removing line:\n%s\n", currLine))
+			printer.Warnf("Removing line:\n%s\n", currLine)
 		} else {
 			resultFileContent = append(resultFileContent, currLine)
 		}
@@ -72,11 +70,12 @@ func rmKnownHosts(cmd *cobra.Command, args []string) {
 	knownHostsNewContent := strings.Join(resultFileContent, "\n")
 	err = ioutil.WriteFile(knownHostsFilePath, []byte(knownHostsNewContent), 0644)
 	if err != nil {
-		printer.Error(fmt.Sprintf("Cannot write to %s, %v", knownHostsFilePath, err))
+		printer.Errorf("Cannot write to %s, %v", knownHostsFilePath, err)
 	}
 }
 
 // TODO implement
 func sortKnownHosts(cmd *cobra.Command, args []string) {
-	fmt.Println("Sort called")
+	printer.Infof("ssh dir is %s\n", sshDir)
+	printer.Info("Sort called")
 }
